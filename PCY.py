@@ -79,7 +79,7 @@ class PCY:
         print("The frequent pairs using the support " + (str)(self.support) + " are:")
         for pair in candidatePairs.keys():
             if(candidatePairs[pair] >= self.support):
-                print(pair)
+                print((str)(pair) +" which appear " + (str)(candidatePairs[pair]) + " times")
 
                     
                
