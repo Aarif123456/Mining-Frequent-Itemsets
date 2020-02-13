@@ -8,14 +8,14 @@ import itertools # used to create candidate pairs efficiently
 import numpy # used to create fixed sized array
 
 class PCY:
-    def __init__(self, support : int, dataFilePath : str, chunk: int, sizeOfBucket : int ):
+    def __init__(self, dataFilePath : str, support : int, chunk: int, sizeOfBucket : int ):
         self.sizeOfBucket=sizeOfBucket # set size of bucket - the bigger the bucket the less false positives
         #  file with data ** need to change so whole file isn't read at once
         with open(dataFilePath,"r", encoding="utf-8") as file: 
             self.dataFile = file.read().splitlines()
         # support threshold is used for eliminating items for the algorithm
-        self.support = ((support/100)*len(self.dataFile))/(chunk/100)
-        self.lastLine = (int)(len(self.dataFile)/(chunk/100)) # last line to process depending on chunk size
+        self.support = ((support/100)*len(self.dataFile))*(chunk/100)
+        self.lastLine = (int)(len(self.dataFile)*(chunk/100)) # last line to process depending on chunk size
 
     @staticmethod
     def hashPair(pair: list, num=1) -> int:
@@ -112,21 +112,22 @@ class PCY:
 
     def printPairs(self, candidatePairs):
         print("The frequent pairs using the support " + (str)(self.support) + " are:")
+        ans = []
         for pair in candidatePairs.keys():
             if(candidatePairs[pair] >= self.support):
+                ans.append(pair)
                 print(pair)
-                # print((str)(pair) +" which appear " + (str)(candidatePairs[pair]) + " times")
+        print(len(ans))
 
     def basicPCY(self):
         bucket = numpy.zeros(self.sizeOfBucket, dtype=int) # bucket to count reduce candidates
         
         # Pass 1        
         countFrequency = dict() # hashtable to store frequency of items
-        for lineNum in range(self.lastLine): # or lineNum%self.chunk !=0 
+        for lineNum in range(self.lastLine): 
             basket = self.dataFile[lineNum].split()
             countFrequency = self.updateFrequency(countFrequency, basket) # count items
             bucket = self.updateBucket(basket, bucket)
-            print("Processing basket number " +(str)(lineNum))
         
         bitVector = self.getBitVector(bucket)
         del bucket # no longer need after we have bit vector
@@ -139,19 +140,16 @@ class PCY:
             basket = self.dataFile[lineNum].split() # split basket into items
             candidatePairs = self.updateCandidatePairs(candidatePairs, basket)
         self.printPairs(candidatePairs)
-        
-
-
 
     def multiStagePCY(self):
         # Pass 1
         bucket1 = numpy.zeros(self.sizeOfBucket, dtype=int)        
         countFrequency = dict() # hashtable to store frequency of items
-        for lineNum in range(self.lastLine): # or lineNum%self.chunk !=0
+        for lineNum in range(self.lastLine): 
             basket = self.dataFile[lineNum].split()
             countFrequency = self.updateFrequency(countFrequency, basket) # count items
             bucket1 = self.updateBucket(basket, bucket1)
-            print("Pass 1: Processing basket number " +(str)(lineNum))
+
         bitVector1 = self.getBitVector(bucket1)
         del bucket1 # no longer need after we have bit vector
         frequentItems = self.getFrequentItems(countFrequency) # get set of frequent item
@@ -163,7 +161,7 @@ class PCY:
             basket = self.dataFile[lineNum].split()
             frequentBasket =  self.getFrequentBasket(frequentItems, basket)           
             bucket2 = self.updateBucket(frequentBasket, bucket2, 2)
-            print("Pass 2: Processing basket number " +(str)(lineNum))
+            
         bitVector2 = self.getBitVector(bucket2)
         del bucket2 # no longer need after we have bit vector
 
@@ -180,11 +178,11 @@ class PCY:
 
         # Pass 1        
         countFrequency = dict() # hashtable to store frequency of items
-        for lineNum in range(self.lastLine): # or lineNum%self.chunk !=0  
+        for lineNum in range(self.lastLine):  
             basket = self.dataFile[lineNum].split()
             countFrequency = self.updateFrequency(countFrequency, basket) # count items       
             buckets = self.multiUpdateBucket(basket , buckets)
-            print("Processing basket number " +(str)(lineNum))
+           
         
         bitVectors = self.multiGetVector(buckets) # get the list of bit vectors
         del buckets # no longer need
@@ -201,9 +199,9 @@ class PCY:
                     
                
                 
-pcy = PCY(5, "retail.txt", 100, 100000)
+pcy = PCY("retail.txt", 5, 100, 100000)
 
 pcy.basicPCY()
 
-# pcy.multiStagePCY()
-# pcy.multiHashPCY()
+pcy.multiStagePCY()
+pcy.multiHashPCY()
