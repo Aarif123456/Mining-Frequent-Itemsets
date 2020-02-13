@@ -1,0 +1,9 @@
+<application>
+  <component name="ProjectManager">
+    <defaultProject>
+      <component name="PropertiesComponent">
+        <property name="settings.editor.selected.configurable" value="com.jetbrains.python.buildout.BuildoutModulesConfigurable" />
+      </component>
+    </defaultProject>
+  </component>
+</application>
