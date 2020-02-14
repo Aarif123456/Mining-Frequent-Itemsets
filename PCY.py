@@ -6,7 +6,7 @@
 from BitVector import BitVector
 import itertools  # used to create candidate pairs efficiently
 import numpy  # used to create fixed sized array
-import time # used to keep track of time
+import time  # used to keep track of time
 
 
 class PCY:
@@ -21,8 +21,8 @@ class PCY:
     @staticmethod
     def hashPair(pair: tuple, num=1) -> int:
         if num == 1:
-            return (int(pair[0]) + int(pair[1])) % 15485863  # Picked a random large prime
-        return (int(pair[0]) + int(pair[1])) % 3060427  # abusing pythons int range...
+            return (pair[0] + pair[1]) % 50021  # Picked a random large prime
+        return (pair[0] + pair[1]) % 50993  # abusing pythons int range...
 
     # count frequent items same as in Apriori
     @staticmethod
@@ -87,7 +87,7 @@ class PCY:
                 candidatePairs[pair] = 0
         return candidatePairs
 
-    # generalized version of the basic PCY's createCandidatePairs algorithm - look through all bitVectors 
+    # generalized version of the basic PCY's createCandidatePairs algorithm - look through all bitVectors
     # before adding a pair to candidate pair
     def createMultiCandidatePair(self, frequentItems: list, bitVectors: list):
         allPairs = itertools.combinations(frequentItems, 2)  # make pairs from frequent item
@@ -123,10 +123,10 @@ class PCY:
     def basicPCY(self):
         bucket = numpy.zeros(self.sizeOfBucket, dtype=int)  # bucket to count reduce candidates
 
-        # Pass 1        
+        # Pass 1
         countFrequency = dict()  # hashtable to store frequency of items
         for lineNum in range(self.lastLine):
-            basket = self.dataFile[lineNum].split()
+            basket = [int(n) for n in self.dataFile[lineNum].split()]
             countFrequency = PCY.updateFrequency(countFrequency, basket)  # count items
             bucket = self.updateBucket(basket, bucket)
 
@@ -138,7 +138,7 @@ class PCY:
         # Pass 2 - finding the pairs
         candidatePairs = self.createCandidatePairs(frequentItems, bitVector)
         for lineNum in range(self.lastLine):
-            basket = self.dataFile[lineNum].split()  # split basket into items
+            basket = [int(n) for n in self.dataFile[lineNum].split()]  # split basket into items
             candidatePairs = PCY.updateCandidatePairs(candidatePairs, basket)
         self.printPairs(candidatePairs)
 
@@ -147,7 +147,7 @@ class PCY:
         bucket1 = numpy.zeros(self.sizeOfBucket, dtype=int)
         countFrequency = dict()  # hashtable to store frequency of items
         for lineNum in range(self.lastLine):
-            basket = self.dataFile[lineNum].split()
+            basket = [int(n) for n in self.dataFile[lineNum].split()]
             countFrequency = PCY.updateFrequency(countFrequency, basket)  # count items
             bucket1 = self.updateBucket(basket, bucket1)
 
@@ -159,7 +159,7 @@ class PCY:
         # Pass 2 - next hash function
         bucket2 = numpy.zeros(self.sizeOfBucket, dtype=int)
         for lineNum in range(self.lastLine):
-            basket = self.dataFile[lineNum].split()
+            basket = [int(n) for n in self.dataFile[lineNum].split()]
             frequentBasket = PCY.getFrequentBasket(frequentItems, basket)
             bucket2 = self.updateBucket(frequentBasket, bucket2, 2)
 
@@ -169,16 +169,17 @@ class PCY:
         # Pass 3 - going through file to search for candidate pairs
         candidatePairs = self.createMultiCandidatePair(frequentItems, [bitVector1, bitVector2])
         for lineNum in range(self.lastLine):
-            basket = self.dataFile[lineNum].split()  # split basket into items
+            basket = [int(n) for n in self.dataFile[lineNum].split()]  # split basket into items
             candidatePairs = PCY.updateCandidatePairs(candidatePairs, basket)
         self.printPairs(candidatePairs)
 
+    def multiHashPCY(self):
         buckets = [numpy.zeros(self.sizeOfBucket, dtype=int), numpy.zeros(self.sizeOfBucket, dtype=int)]
 
-        # Pass 1        
+        # Pass 1
         countFrequency = dict()  # hashtable to store frequency of items
         for lineNum in range(self.lastLine):
-            basket = self.dataFile[lineNum].split()
+            basket = [int(n) for n in self.dataFile[lineNum].split()]
             countFrequency = PCY.updateFrequency(countFrequency, basket)  # count items
             buckets = self.multiUpdateBucket(basket, buckets)
 
@@ -190,24 +191,24 @@ class PCY:
         # Pass 2 - finding the pairs
         candidatePairs = self.createMultiCandidatePair(frequentItems, bitVectors)
         for lineNum in range(self.lastLine):
-            basket = self.dataFile[lineNum].split()  # split basket into items
+            basket = [int(n) for n in self.dataFile[lineNum].split()]  # split basket into items
             candidatePairs = PCY.updateCandidatePairs(candidatePairs, basket)
         self.printPairs(candidatePairs)
 
 
-pcy = PCY("retail.txt", 5, 100, 100000)
+pcy = PCY("retail.txt", 1, 100, 50000)
 
 start = time.perf_counter()
 pcy.basicPCY()
 end = time.perf_counter()
-print(f"Basic PCY finished in {(end - start)*1000:0.3f}ms")
+print(f"Basic PCY finished in {(end - start) * 1000:0.3f}ms")
 
 start = time.perf_counter()
 pcy.multiStagePCY()
 end = time.perf_counter()
-print(f"Multistage PCY finished in {(end - start)*1000:0.3f}ms")
+print(f"Multistage PCY finished in {(end - start) * 1000:0.3f}ms")
 
 start = time.perf_counter()
 pcy.multiHashPCY()
 end = time.perf_counter()
-print(f"MultiHash PCY finished in {(end - start)*1000:0.3f}ms")
+print(f"MultiHash PCY finished in {(end - start) * 1000:0.3f}ms")
