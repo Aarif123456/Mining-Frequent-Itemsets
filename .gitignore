@@ -200,3 +200,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /.idea/
+/keymaps/
+/inspection/
