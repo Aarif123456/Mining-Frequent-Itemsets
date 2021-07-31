@@ -23,20 +23,20 @@ class BitVector:
             return False
         return True
 
-        # flip value at position by using XOR
-
+        
+    # Flip value at position by using XOR
     def flip_bit(self, pos: int):
         pos = BitVector.find_pos(pos)
         self.bitVector[pos[0]] ^= self.posVector[pos[1]]
 
-        # Set bit a position to true by using OR
-
+        
+    # Set bit a position to true by using OR
     def set_bit(self, pos: int):
         pos = BitVector.find_pos(pos)
         self.bitVector[pos[0]] |= self.posVector[pos[1]]
 
-        # Set bit a position to false by using AND
-
+        
+    # Set bit a position to false by using AND
     def reset_bit(self, pos: int):
         pos = BitVector.find_pos(pos)
         self.bitVector[pos[0]] &= ~self.posVector[pos[1]]
