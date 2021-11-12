@@ -13,34 +13,34 @@ class BitVector:
 
     # since each byte has 8 bits we have to translate position into a tuple
     @staticmethod
-    def findPos(pos: int) -> tuple:
+    def find_pos(pos: int) -> tuple:
         return math.floor(pos / 8), pos % 8
 
-    def getBit(self, pos: int) -> bool:
-        pos = BitVector.findPos(pos)
+    def get_bit(self, pos: int) -> bool:
+        pos = BitVector.find_pos(pos)
         check = self.posVector[pos[1]] & self.bitVector[pos[0]]
         if check == 0:
             return False
         return True
 
-        # flip value at position by using XOR
-
-    def flipBit(self, pos: int):
-        pos = BitVector.findPos(pos)
+        
+    # Flip value at position by using XOR
+    def flip_bit(self, pos: int):
+        pos = BitVector.find_pos(pos)
         self.bitVector[pos[0]] ^= self.posVector[pos[1]]
 
-        # Set bit a position to true by using OR
-
-    def setBit(self, pos: int):
-        pos = BitVector.findPos(pos)
+        
+    # Set bit a position to true by using OR
+    def set_bit(self, pos: int):
+        pos = BitVector.find_pos(pos)
         self.bitVector[pos[0]] |= self.posVector[pos[1]]
 
-        # Set bit a position to false by using AND
-
-    def resetBit(self, pos: int):
-        pos = BitVector.findPos(pos)
+        
+    # Set bit a position to false by using AND
+    def reset_bit(self, pos: int):
+        pos = BitVector.find_pos(pos)
         self.bitVector[pos[0]] &= ~self.posVector[pos[1]]
 
-    def printVector(self):
+    def print_vector(self):
         i = int.from_bytes(self.bitVector, byteorder='big')
         print("hex: " + "{0:x}".format(i))

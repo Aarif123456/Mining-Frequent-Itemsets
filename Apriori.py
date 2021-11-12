@@ -7,7 +7,7 @@ import itertools  # used to create candidate pairs efficiently
 import time  # used to keep track of time
 
 
-class APriori:
+class Apriori:
     def __init__(self, dataFilePath: str, support: int, chunk: int):
         #  store file data
         with open(dataFilePath, "r", encoding="utf-8") as file:
@@ -16,53 +16,53 @@ class APriori:
         self.support = ((support / 100) * len(self.dataFile)) * (chunk / 100)
         self.lastLine = int(len(self.dataFile) * (chunk / 100))  # last line to process depending on chunk size
 
-    def runAPriori(self):
+    def run_apriori(self):
         start = time.perf_counter()
         # Pass 1
-        countFrequency = dict()  # hashtable to store frequency of items
+        count_frequency = dict()  # hashtable to store frequency of items
         for lineNum in range(self.lastLine):
             basket = self.dataFile[lineNum].split()
 
             for item in basket:
-                if item not in countFrequency:  # if item not in basket then add to basket
-                    countFrequency[item] = 1
+                if item not in count_frequency:  # if item not in basket then add to basket
+                    count_frequency[item] = 1
                 else:
-                    countFrequency[item] += 1  # otherwise add 1 to count
+                    count_frequency[item] += 1  # otherwise add 1 to count
 
         # get list of frequent items
-        frequentItems = list()
-        for item in countFrequency.keys():  # get the items that are past the threshold
-            if countFrequency[item] >= self.support:
-                frequentItems.append(item)
-        del countFrequency
+        frequent_items = list()
+        for item in count_frequency.keys():  # get the items that are past the threshold
+            if count_frequency[item] >= self.support:
+                frequent_items.append(item)
+        del count_frequency
 
         # Pass 2
-        allPairs = itertools.combinations(frequentItems, 2)  # make pairs from frequent items
+        all_pairs = itertools.combinations(frequent_items, 2)  # make pairs from frequent items
 
-        candidatePairs = dict()
-        for pair in allPairs:
-            candidatePairs[pair] = 0
+        candidate_pairs = dict()
+        for pair in all_pairs:
+            candidate_pairs[pair] = 0
 
         for lineNum in range(self.lastLine):
             basket = self.dataFile[lineNum].split()  # split basket into items
             pairs = itertools.combinations(basket, 2)
             for pair in pairs:
-                if pair in candidatePairs:
-                    candidatePairs[pair] += 1
+                if pair in candidate_pairs:
+                    candidate_pairs[pair] += 1
 
         # get set of frequent pairs
-        frequentPairs = set()
-        for item in candidatePairs.keys():  # get the pairs that are past the threshold
-            if candidatePairs[item] >= self.support:
-                frequentPairs.add(item)
-        del candidatePairs
+        frequent_pairs = set()
+        for item in candidate_pairs.keys():  # get the pairs that are past the threshold
+            if candidate_pairs[item] >= self.support:
+                frequent_pairs.add(item)
+        del candidate_pairs
 
         end = time.perf_counter()
-        print(f"APriori finished in {(end - start) * 1000:0.3f}ms")
+        print(f"Apriori finished in {(end - start) * 1000:0.3f}ms")
 
-        print("Frequent pairs found: " + str(len(frequentPairs)))
+        print("Frequent pairs found: " + str(len(frequent_pairs)))
 
 
-ap = APriori("retail.txt", 1, 100)
+ap = Apriori("retail.txt", 1, 100)
 
-ap.runAPriori()
+ap.run_apriori()
